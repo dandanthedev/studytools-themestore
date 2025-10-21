@@ -1,0 +1,319 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { mutation, query } from "../_generated/server";
+import { ConvexError, v } from "convex/values";
+
+function validateData(data: string) {
+  try {
+    JSON.parse(data);
+  } catch {
+    return false;
+  }
+}
+
+export const create = mutation({
+  args: {
+    name: v.string(),
+    description: v.string(),
+    data: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+    const theme = await ctx.db.insert("themes", {
+      name: "",
+      description: "",
+      data: "",
+      user: userId,
+      published: false,
+      downloads: [],
+      likes: [],
+      dislikes: [],
+    });
+    await ctx.db.insert("themeUpdates", {
+      theme: theme,
+      name: args.name,
+      description: args.description,
+      data: args.data,
+      initial: true,
+    });
+
+    return theme;
+  },
+});
+
+export const edit = mutation({
+  args: {
+    id: v.id("themes"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    data: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    if (args.data && !validateData(args.data)) {
+      throw new ConvexError("Thema bestand ongeldig");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const existingUpdate = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+    if (!existingUpdate) {
+      await ctx.db.insert("themeUpdates", {
+        theme: args.id,
+        name: args.name,
+        description: args.description,
+        data: args.data,
+        initial: false,
+      });
+    } else {
+      if (existingUpdate.sentForApproval)
+        throw new ConvexError("Thema is in afwachting van goedkeuring");
+      await ctx.db.patch(existingUpdate._id, {
+        name: args.name,
+        description: args.description,
+        data: args.data,
+      });
+    }
+  },
+});
+
+export const sendForApproval = mutation({
+  args: {
+    id: v.id("themes"),
+    status: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const existingUpdate = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+    if (!existingUpdate) {
+      throw new ConvexError("Geen updates om te verzenden");
+    }
+
+    await ctx.db.patch(existingUpdate._id, {
+      sentForApproval: args.status,
+    });
+    await ctx.db.patch(args.id, {
+      updateNote: "",
+    });
+  },
+});
+
+export const canPublish = query({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const existingUpdate = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+
+    if (existingUpdate?.initial) return false;
+    if (theme.name.length < 1) return false;
+    if (theme.description.length < 1) return false;
+    if (theme.data.length < 1) return false;
+
+    return true;
+  },
+});
+
+export const publish = mutation({
+  args: {
+    id: v.id("themes"),
+    status: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const existingUpdate = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+
+    if (existingUpdate && existingUpdate.initial) {
+      throw new ConvexError("Thema moet goedgekeurd worden voor publicatie.");
+    }
+
+    await ctx.db.patch(args.id, {
+      published: args.status,
+    });
+  },
+});
+
+export const remove = mutation({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te verwijderen"
+      );
+    }
+    const updates = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .collect();
+    for (const update of updates) {
+      await ctx.db.delete(update._id);
+    }
+    await ctx.db.delete(args.id);
+  },
+});
+
+export const awaitingApproval = query({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const existingUpdate = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+
+    if (existingUpdate && existingUpdate.sentForApproval) {
+      return true;
+    }
+
+    return false;
+  },
+});
+
+export const get = query({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.user !== userId) {
+      throw new ConvexError(
+        "Je hebt geen toestemming om dit thema te bewerken"
+      );
+    }
+
+    const update = await ctx.db
+      .query("themeUpdates")
+      .withIndex("theme", (q) => q.eq("theme", args.id))
+      .first();
+
+    return {
+      id: theme._id,
+      name: {
+        live: theme.name,
+        updated: update?.name || null,
+      },
+      description: {
+        live: theme.description,
+        updated: update?.description || null,
+      },
+      data: {
+        live: theme.data,
+        updated: update?.data || null,
+      },
+      published: theme.published,
+
+      updateNote: theme.updateNote || null,
+    };
+  },
+});
