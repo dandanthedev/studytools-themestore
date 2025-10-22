@@ -2,13 +2,21 @@
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
-export default function AuthLayout({
+export default function AuthWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  return (
+    <Suspense fallback={<div>Laden...</div>}>
+      <AuthLayout>{children}</AuthLayout>
+    </Suspense>
+  );
+}
+
+function AuthLayout({ children }: { children: React.ReactNode }) {
   const user = useQuery(api.functions.user.get);
   const router = useRouter();
   const setupComplete = useQuery(api.functions.user.setupComplete);
