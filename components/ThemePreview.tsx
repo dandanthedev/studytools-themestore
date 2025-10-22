@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import React, { useRef, useEffect, useState, ReactElement } from "react";
 
 // === TYPES ===
@@ -67,7 +68,10 @@ function throttle<T extends (...args: Parameters<T>) => void>(
 }
 
 // === MAIN COMPONENT ===
-export default function ThemePreview({
+export default dynamic(() => Promise.resolve(ThemePreview), {
+  ssr: false,
+});
+function ThemePreview({
   style = {},
   scale = 1,
 }: CanvasPreviewProps): ReactElement {

@@ -100,17 +100,15 @@ export default function Profile() {
 
       <div className="flex flex-col gap-4 p-3 items-center">
         {themes?.map((theme) => (
-          <>
-            <Theme
-              id={theme._id}
-              key={theme._id}
-              name={theme.name}
-              description={theme.description}
-              data={theme.data}
-              preview={theme.preview}
-              canEdit={user.id === theme.user}
-            />
-          </>
+          <Theme
+            id={theme._id}
+            key={theme._id}
+            name={theme.name}
+            description={theme.description}
+            data={theme.data}
+            preview={theme.preview}
+            canEdit={user.id === theme.user}
+          />
         ))}
       </div>
     </>

@@ -71,7 +71,7 @@ export default function Theme() {
   return (
     <div className="flex flex-col gap-4 justify-center items-center mt-3 w-full">
       <div className="w-64 h-32">
-        <ThemePreview style={JSON.parse(theme?.data.live || "{}")} />
+        <ThemePreview style={JSON.parse(theme?.data.live ?? "{}")} />
       </div>
       <h1 className="text-3xl text-center text-foreground font-bold">
         {theme?.name.live || theme?.name.updated}

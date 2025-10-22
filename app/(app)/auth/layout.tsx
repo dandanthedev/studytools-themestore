@@ -1,7 +1,7 @@
 "use client";
 import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AuthLayout({
@@ -13,11 +13,16 @@ export default function AuthLayout({
   const router = useRouter();
   const setupComplete = useQuery(api.functions.user.setupComplete);
   const pathname = usePathname();
+  const search = useSearchParams();
   useEffect(() => {
-    if (user && setupComplete) router.replace("/");
+    if (user && setupComplete) {
+      if (search.get("redirect") && search.get("redirect")?.startsWith("/"))
+        router.replace(search.get("redirect")!);
+      else router.replace("/");
+    }
     if (user && !setupComplete && pathname !== "/auth/setup")
       router.replace("/auth/setup");
-  }, [user, router, pathname, setupComplete]);
+  }, [user, router, pathname, setupComplete, search]);
 
   return (
     <div className="flex items-center justify-center h-[calc(100vh-74px)] w-full bg-primary">
