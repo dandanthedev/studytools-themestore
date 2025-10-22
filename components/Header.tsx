@@ -22,19 +22,24 @@ export default function Header() {
         />
       </Link>
       {user ? (
-        <Link href={`/profile/${user.id}`}>
-          <Avatar className="size-12">
-            <AvatarImage src={user.image || undefined} alt={user.name} />
-            <AvatarFallback>
-              {user.name ? user.name.charAt(0) : "?"}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <div className="flex flex-row gap-4 items-center">
+          <Link href={`/create`}>
+            <Button className="cursor-pointer" variant="outline">
+              Nieuw thema
+            </Button>
+          </Link>
+          <Link href={`/profile/${user.id}`}>
+            <Avatar className="size-12">
+              <AvatarImage src={user.image || undefined} alt={user.name} />
+              <AvatarFallback>
+                {user.name ? user.name.charAt(0) : "?"}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+        </div>
       ) : (
         <Link href="/auth/login">
-          <Button variant="secondary" className="cursor-pointer">
-            Inloggen
-          </Button>
+          <Button className="cursor-pointer">Inloggen</Button>
         </Link>
       )}
     </div>
