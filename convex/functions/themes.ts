@@ -1,5 +1,5 @@
-import { v } from "convex/values";
-import { query } from "../_generated/server";
+import { ConvexError, v } from "convex/values";
+import { mutation, query } from "../_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Id } from "../_generated/dataModel";
 
@@ -141,5 +141,30 @@ export const list = query({
       ...theme,
       userName: users[index]?.name,
     }));
+  },
+});
+
+export const logDownload = mutation({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (theme.downloads.includes(userId)) {
+      return;
+    }
+
+    await ctx.db.patch(args.id, {
+      downloads: [...theme.downloads, userId],
+    });
   },
 });
