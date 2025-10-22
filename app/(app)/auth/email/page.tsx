@@ -9,8 +9,17 @@ import {
 } from "@/components/ui/input-otp";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-export default function EmailVerification() {
+import { Suspense, useState } from "react";
+
+export default function EmailVerificationWrapper() {
+  return (
+    <Suspense>
+      <EmailVerification />
+    </Suspense>
+  );
+}
+
+function EmailVerification() {
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [code, setCode] = useState("");
