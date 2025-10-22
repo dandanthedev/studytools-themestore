@@ -23,12 +23,15 @@ export default function Login() {
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
           setError("");
-          const res = await signIn("password", formData).catch(() => {
-            //todo: convex moet zn errors fiksen
-            setError("Email of wachtwoord is onjuist");
-          });
+          const res = await signIn("password", formData)
+            .catch(() => {
+              //todo: convex moet zn errors fiksen
+              setError("Email of wachtwoord is onjuist");
+              return false;
+            })
+            .then(() => true);
 
-          if (error !== "") return;
+          if (res === false) return;
 
           if (typeof res === "object")
             router.replace("/auth/email?email=" + username);

@@ -25,15 +25,17 @@ export default function Register() {
           e.preventDefault();
           const formData = new FormData(e.target as HTMLFormElement);
           setError("");
-          await signIn("password", formData).catch(() => {
-            //todo: convex moet zn errors fiksen
-            setError(
-              "Account kon niet aangemaakt worden. Misschien is de email al in gebruik?"
-            );
-          });
+          const res = await signIn("password", formData)
+            .catch(() => {
+              //todo: convex moet zn errors fiksen
+              setError(
+                "Account kon niet aangemaakt worden. Misschien is de email al in gebruik?"
+              );
+              return false;
+            })
+            .then(() => true);
 
-          if (error !== "") return;
-
+          if (res === false) return;
           router.replace("/auth/email?email=" + username);
         }}
       >
