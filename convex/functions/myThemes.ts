@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "../_generated/server";
+import { action, internalAction, mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
+import { internal } from "../_generated/api";
 
 function validateData(data: string) {
   try {
@@ -128,9 +129,52 @@ export const sendForApproval = mutation({
     await ctx.db.patch(existingUpdate._id, {
       sentForApproval: args.status,
     });
+
     await ctx.db.patch(args.id, {
       updateNote: "",
     });
+
+    await ctx.scheduler.runAfter(0, internal.functions.myThemes.notifyMe, {
+      themeName: theme.name,
+      status: args.status,
+    });
+  },
+});
+
+export const notifyMe = internalAction({
+  args: {
+    themeName: v.string(),
+    status: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    await fetch(
+      "https://discord.com/api/channels/" +
+        process.env.DISCORD_CHANNEL_ID +
+        "/messages",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bot " + process.env.DISCORD_TOKEN,
+        },
+        body: JSON.stringify({
+          embeds: [
+            {
+              description: `Review status ${args.status ? "ingestuurd" : "ingetrokken"} voor ${args.themeName}`,
+              color: 0x00ff00,
+              author: {
+                name: "StudyTools",
+              },
+            },
+          ],
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        return res;
+      });
   },
 });
 
