@@ -24,6 +24,10 @@ export default function RootLayout({
         <ConvexAuthProvider client={convex}>
           <Header />
           {children}
+          <p className="fixed bottom-2 left-0 right-0 text-center text-sm text-muted-foreground">
+            De StudyTools Marketplace is een onofficieel community-project en is
+            dus niet gelinked aan Quinten of StudyTools in het algemeen.
+          </p>
         </ConvexAuthProvider>
       </body>
     </html>
