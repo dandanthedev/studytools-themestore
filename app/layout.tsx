@@ -1,5 +1,4 @@
 "use client";
-import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";

@@ -43,7 +43,6 @@ function throttle<T extends (...args: Parameters<T>) => void>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
   let flag = false;
 
@@ -54,7 +53,7 @@ function throttle<T extends (...args: Parameters<T>) => void>(
     if (!flag) {
       func.apply(this, args);
       flag = true;
-      timeout = setTimeout(() => {
+      setTimeout(() => {
         flag = false;
         if (lastArgs) {
           func.apply(this, lastArgs);
@@ -344,6 +343,7 @@ export default function ThemePreview({
     const listener = (): void => drawCanvas();
     media.addEventListener("change", listener);
     return () => media.removeEventListener("change", listener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style, scale, preferredColor]);
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
@@ -9,15 +8,13 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useAuthActions } from "@convex-dev/auth/react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 export default function EmailVerification() {
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [code, setCode] = useState("");
   const { signIn } = useAuthActions();
-  const router = useRouter();
 
   if (!searchParams.get("email")) return <p>Email niet gevonden</p>;
 
@@ -70,6 +67,7 @@ export default function EmailVerification() {
           type="hidden"
           value={searchParams.get("email") || ""}
         />
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
         <Button disabled={code.length < 6}>Verifieren</Button>
       </form>
     </>
