@@ -10,7 +10,7 @@ export default function AuthHandlerWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={<div>Laden...</div>}>
+    <Suspense>
       <AuthHandlerLayout>{children}</AuthHandlerLayout>
     </Suspense>
   );
