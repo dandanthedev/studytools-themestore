@@ -39,7 +39,9 @@ export default function Header() {
         </div>
       ) : (
         <Link href="/auth/login">
-          <Button className="cursor-pointer">Inloggen</Button>
+          <Button className="cursor-pointer" variant="secondary">
+            Inloggen
+          </Button>
         </Link>
       )}
     </div>
