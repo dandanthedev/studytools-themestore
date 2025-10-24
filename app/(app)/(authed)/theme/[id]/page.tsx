@@ -187,7 +187,9 @@ export default function Theme() {
       <div className="flex gap-4 justify-center">
         <Button
           onClick={() => {
-            sendForApproval({ id, status: !awaitingApproval });
+            sendForApproval({ id, status: !awaitingApproval }).catch((e) => {
+              setError(e.message);
+            });
           }}
           disabled={
             !(
