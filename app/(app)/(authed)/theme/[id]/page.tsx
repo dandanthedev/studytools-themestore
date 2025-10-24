@@ -72,6 +72,8 @@ export default function Theme() {
     }
   }, [files]);
 
+  if (!theme) return null;
+
   return (
     <div className="flex flex-col gap-4 justify-center items-center mt-3 w-full">
       <div className="w-64 h-32">

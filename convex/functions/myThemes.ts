@@ -332,7 +332,7 @@ export const get = query({
 
     const theme = await ctx.db.get(args.id);
     if (!theme) {
-      throw new ConvexError("Thema niet gevonden");
+      return null;
     }
 
     if (theme.user !== userId) {
