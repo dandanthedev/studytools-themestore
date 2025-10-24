@@ -1,11 +1,13 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { action, internalAction, mutation, query } from "../_generated/server";
+import { internalAction, mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 
 function validateData(data: string) {
+  console.log("data to parse", data);
   try {
     JSON.parse(data);
+    return true;
   } catch {
     return false;
   }
@@ -15,7 +17,6 @@ export const create = mutation({
   args: {
     name: v.string(),
     description: v.string(),
-    data: v.string(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -36,7 +37,6 @@ export const create = mutation({
       theme: theme,
       name: args.name,
       description: args.description,
-      data: args.data,
       initial: true,
     });
 
@@ -124,6 +124,11 @@ export const sendForApproval = mutation({
       .first();
     if (!existingUpdate) {
       throw new ConvexError("Geen updates om te verzenden");
+    }
+
+    if (theme.data.length < 1) {
+      if (!existingUpdate?.data || existingUpdate.data.length < 1)
+        throw new ConvexError("Je moet nog een data bestand toevoegen");
     }
 
     await ctx.db.patch(existingUpdate._id, {

@@ -58,7 +58,7 @@ export default function Theme({
 
       {canEdit && <Link href={`/theme/${id}`}>Bewerken</Link>}
 
-      {preview && <p>(voorbeeld)</p>}
+      {preview && <p>(concept)</p>}
     </div>
   );
 }

@@ -11,12 +11,14 @@ import {
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Theme() {
   const params = useParams();
   const id = params.id as Id<"themes">;
+
+  const router = useRouter();
 
   const theme = useQuery(api.functions.myThemes.get, {
     id,
@@ -59,7 +61,9 @@ export default function Theme() {
         const text = e.target?.result as string;
         try {
           const data = JSON.parse(text);
-          setData(JSON.stringify(data));
+          const string = JSON.stringify(data);
+          console.log(string);
+          setData(string);
         } catch {
           setError("Bestand is geen .sttheme bestand");
         }
@@ -106,8 +110,8 @@ export default function Theme() {
                 ? (formData.get("description") as string)
                 : undefined,
             data: data.length > 0 ? data : undefined,
-          }).catch(() => {
-            setError("Thema kon niet aangepast worden");
+          }).catch((e) => {
+            setError(e.message);
           });
 
           setSaved(true);
@@ -209,6 +213,7 @@ export default function Theme() {
             if (!confirm("Weet je zeker dat je dit thema wilt verwijderen?"))
               return;
             remove({ id });
+            router.push("/");
           }}
           variant="destructive"
         >
