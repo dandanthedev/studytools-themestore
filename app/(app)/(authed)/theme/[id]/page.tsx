@@ -188,7 +188,7 @@ export default function Theme() {
         <Button
           onClick={() => {
             sendForApproval({ id, status: !awaitingApproval }).catch((e) => {
-              setError(e.message);
+              setError(e.data || e.message);
             });
           }}
           disabled={
