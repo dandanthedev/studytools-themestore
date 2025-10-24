@@ -113,7 +113,7 @@ export default function Theme() {
                 : undefined,
             data: data.length > 0 ? data : undefined,
           }).catch((e) => {
-            setError(e.message);
+            setError(e.data || e.message);
           });
 
           setSaved(true);

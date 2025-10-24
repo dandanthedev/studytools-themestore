@@ -2,11 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dropzone,
-  DropzoneContent,
-  DropzoneEmptyState,
-} from "@/components/ui/shadcn-io/dropzone";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -28,7 +23,7 @@ export default function Create() {
             name: formData.get("name") as string,
             description: formData.get("description") as string,
           }).catch((e) => {
-            setError(e.message);
+            setError(e.data || e.message);
           });
           if (id) router.push(`/theme/${id}`);
         }}
