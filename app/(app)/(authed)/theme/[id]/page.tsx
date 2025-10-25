@@ -80,8 +80,10 @@ export default function Theme() {
         <ThemePreview
           style={JSON.parse(
             theme?.data.live?.length && theme.data.live.length > 0
-              ? JSON.parse(theme?.data.live)
-              : "{}"
+              ? theme.data.live
+              : theme?.data.updated?.length && theme.data.updated.length > 0
+                ? theme.data.updated
+                : "{}"
           )}
         />
       </div>
