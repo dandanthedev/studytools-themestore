@@ -296,6 +296,10 @@ export default function Theme() {
               : "Beoordeling aanvragen"}
           </Button>
 
+          <p className="text-sm text-muted-foreground text-center">
+            let op: na goedkeuring wordt je thema automatisch gepubliceerd.
+          </p>
+
           {canPublish && (
             <Button
               onClick={() => {
