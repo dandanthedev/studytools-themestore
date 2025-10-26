@@ -82,7 +82,6 @@ export const sendResponse = mutation({
         data: update.data,
         updateNote: args.reason,
         updatedAt: Date.now(),
-        published: true,
       });
       await ctx.db.delete(args.id);
     }
