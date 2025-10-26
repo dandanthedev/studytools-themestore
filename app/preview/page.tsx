@@ -63,6 +63,7 @@ function ThemePreview() {
           }
           #st-widget-homework{
           background-color: var(--st-background-secondary);
+          color: var(--st-foreground-primary);
           }
             `;
 
@@ -109,20 +110,20 @@ function ThemePreview() {
             className="h-6 bg-blue-600 rounded"
             id="st-start-header-strip"
             style={{
-              backgroundColor: parsed.sideColor
-                ? hslToStyle(parsed.sideColor)
+              backgroundColor: parsed.color
+                ? hslToStyle(parsed.color)
                 : undefined,
             }}
           ></div>
-          <div className="flex-1 bg-zinc-950 rounded"></div>
+          <table className="flex-1 bg-zinc-950 rounded k-grid-content"></table>
         </div>
 
         <div className="w-1/4 flex flex-col gap-2">
           <div
             className="flex-1 bg-blue-900 rounded"
             style={{
-              backgroundColor: parsed.appbarColor
-                ? hslToStyle(parsed.appbarColor)
+              backgroundColor: parsed.color
+                ? hslToStyle(parsed.color)
                 : undefined,
               backgroundImage:
                 (parsed.decoration?.customUrl &&
