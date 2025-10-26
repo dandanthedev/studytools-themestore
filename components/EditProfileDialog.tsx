@@ -1,22 +1,36 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/convex/_generated/api";
 import { useAuthToken } from "@convex-dev/auth/react";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
-import { AlertCircle, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Settings, CheckCircle2, AlertCircle } from "lucide-react";
 
-export default function Setup() {
+interface EditProfileDialogProps {
+  trigger?: React.ReactNode;
+}
+
+export default function EditProfileDialog({ trigger }: EditProfileDialogProps) {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
   const token = useAuthToken();
 
+  const currentUser = useQuery(api.functions.user.get);
   const available = useQuery(api.functions.user.getUsernameAvailability, {
     username,
   });
@@ -30,10 +44,13 @@ export default function Setup() {
     }
   }, [file]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (currentUser?.name) setUsername(currentUser.name);
+  }, [currentUser]);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true);
 
     try {
       if (file) {
@@ -49,36 +66,44 @@ export default function Setup() {
         );
         const json = await res.json();
         if (json.error) {
-          setError(json.error);
-          setIsLoading(false);
-          return;
+          return setError(json.error);
         }
       }
 
       await save({ username });
-      // Success will redirect automatically
-    } catch (err) {
+      setSaved(true);
+      setTimeout(() => {
+        setSaved(false);
+        setDialogOpen(false);
+        setFile(null);
+      }, 2000);
+    } catch (e) {
       //@ts-expect-error ik fiks dit ooit
-      setError(err.message || "Er is een fout opgetreden");
-      setIsLoading(false);
+      setError(e.message || "Er is een fout opgetreden");
     }
   };
 
   return (
-    <div className="container max-w-md mx-auto py-16 px-4">
-      <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Welkom!</h1>
-          <p className="text-muted-foreground">
-            Maak je profiel compleet door de volgende gegevens in te vullen
-          </p>
-        </div>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button size="lg" variant="outline" className="gap-2">
+            <Settings className="w-4 h-4" />
+            Profiel bewerken
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Profiel bewerken</DialogTitle>
+          <DialogDescription>
+            Pas je gebruikersnaam en profielfoto aan
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSaveProfile} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="username">
-              Gebruikersnaam <span className="text-red-500">*</span>
-            </Label>
+            <Label htmlFor="username">Gebruikersnaam</Label>
             <Input
               id="username"
               placeholder="Bijv. henk"
@@ -86,15 +111,8 @@ export default function Setup() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              maxLength={30}
             />
-            {username && available === true && (
-              <p className="text-sm text-green-600 flex items-center gap-1">
-                <Check className="w-3 h-3" />
-                Gebruikersnaam is beschikbaar
-              </p>
-            )}
-            {available === false && (
+            {available === false && username !== currentUser?.name && (
               <p className="text-sm text-red-500">
                 Gebruikersnaam is niet beschikbaar
               </p>
@@ -112,11 +130,6 @@ export default function Setup() {
                 setFile(e.target.files?.[0] || null);
               }}
             />
-            {file && (
-              <p className="text-sm text-muted-foreground">
-                Geselecteerd: {file.name}
-              </p>
-            )}
           </div>
 
           {error && (
@@ -126,26 +139,26 @@ export default function Setup() {
             </Alert>
           )}
 
+          {saved && (
+            <Alert className="border-green-500 bg-green-500/10">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-900 dark:text-green-100">
+                Profiel succesvol opgeslagen!
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Button
             type="submit"
             className="w-full"
-            size="lg"
-            disabled={!username || available === false || isLoading}
+            disabled={
+              saved || (available === false && username !== currentUser?.name)
+            }
           >
-            {isLoading ? "Profiel opslaan..." : "Profiel opslaan"}
+            {saved ? "Opgeslagen!" : "Profiel opslaan"}
           </Button>
         </form>
-
-        {/* Info Section */}
-        <div className="pt-6 border-t space-y-3 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">Over je gebruikersnaam:</p>
-          <ul className="space-y-1 list-disc list-inside">
-            <li>Deze wordt zichtbaar op je profiel en {"thema's"}</li>
-            <li>Je kunt deze later altijd aanpassen</li>
-            <li>Maximaal 30 tekens</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

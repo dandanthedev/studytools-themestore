@@ -75,6 +75,9 @@ export const getByUser = query({
         description: theme.description,
         data: theme.data,
         preview: false,
+        likes: theme.likes.length,
+        dislikes: theme.dislikes.length,
+        downloads: theme.downloads.length,
       }));
     else {
       return await Promise.all(
@@ -89,6 +92,9 @@ export const getByUser = query({
             description: theme.description || update?.description || "",
             data: theme.data || update?.data || "{}",
             preview: !theme.published,
+            likes: theme.likes.length,
+            dislikes: theme.dislikes.length,
+            downloads: theme.downloads.length,
           };
         })
       );
@@ -149,6 +155,9 @@ export const list = query({
         name: users[index]?.name,
       },
       data: theme.data,
+      likes: theme.likes.length,
+      dislikes: theme.dislikes.length,
+      downloads: theme.downloads.length,
     }));
   },
 });
@@ -207,5 +216,77 @@ export const data = query({
     }
 
     return theme.data.length > 0 ? JSON.parse(theme.data) : ({} as ThemeJSON);
+  },
+});
+
+export const userRatingStatus = query({
+  args: {
+    id: v.id("themes"),
+  },
+  returns: v.union(v.literal("like"), v.literal("dislike"), v.null()),
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      return null;
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      return null;
+    }
+
+    if (theme.likes.includes(userId)) {
+      return "like";
+    }
+    if (theme.dislikes.includes(userId)) {
+      return "dislike";
+    }
+
+    return null;
+  },
+});
+
+export const rate = mutation({
+  args: {
+    id: v.id("themes"),
+    status: v.union(v.literal("like"), v.literal("dislike")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new ConvexError("Je bent niet ingelogd");
+    }
+
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Thema niet gevonden");
+    }
+
+    if (args.status === "like") {
+      if (theme.dislikes.includes(userId)) {
+        theme.dislikes = theme.dislikes.filter((id) => id !== userId);
+      }
+
+      if (theme.likes.includes(userId)) {
+        theme.likes = theme.likes.filter((id) => id !== userId);
+      } else {
+        theme.likes.push(userId);
+      }
+    } else if (args.status === "dislike") {
+      if (theme.likes.includes(userId)) {
+        theme.likes = theme.likes.filter((id) => id !== userId);
+      }
+
+      if (theme.dislikes.includes(userId)) {
+        theme.dislikes = theme.dislikes.filter((id) => id !== userId);
+      } else {
+        theme.dislikes.push(userId);
+      }
+    }
+
+    await ctx.db.patch(args.id, {
+      likes: theme.likes,
+      dislikes: theme.dislikes,
+    });
   },
 });

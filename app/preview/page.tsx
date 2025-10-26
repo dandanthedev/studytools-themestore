@@ -2,12 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import {
-  DEFAULT_THEME,
-  parseThemeJSON,
-  ThemeConfig,
-  ThemeJSON,
-} from "@/lib/themes";
+import { DEFAULT_THEME, parseThemeJSON, ThemeConfig } from "@/lib/themes";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
