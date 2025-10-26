@@ -2,7 +2,13 @@
 
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { DEFAULT_THEME, parseThemeJSON, ThemeConfig } from "@/lib/themes";
+import {
+  DEFAULT_THEME,
+  parseThemeJSON,
+  ThemeConfig,
+  ThemeJSON,
+} from "@/lib/themes";
+import { useAuthToken } from "@convex-dev/auth/react";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -38,12 +44,27 @@ export default function ThemePreviewWrapper() {
 }
 
 function ThemePreview() {
+  const token = useAuthToken();
+
   const [parsed, setParsed] = useState<ThemeConfig>();
   const params = useSearchParams();
   const id = params.get("id");
-  const style = useQuery(api.functions.themes.data, {
-    id: id as Id<"themes">,
-  });
+  const [style, setStyle] = useState<ThemeJSON>();
+
+  useEffect(() => {
+    if (id) {
+      //todo: this still opens convex websocket
+      fetch(`${process.env.NEXT_PUBLIC_CONVEX_SITE_URL}/previewData?id=${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setStyle(data);
+        });
+    }
+  }, [id, token]);
 
   useEffect(() => {
     if (style) {

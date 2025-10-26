@@ -62,4 +62,36 @@ http.route({
   }),
 });
 
+http.route({
+  path: "/previewData",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, {
+      headers: corsHeaders,
+    });
+  }),
+});
+
+http.route({
+  path: "/previewData",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const urlParsed = new URL(request.url);
+    const themeId = urlParsed.searchParams.get("id") as Id<"themes">;
+    if (!themeId) {
+      return replyJSON({ error: "No theme id provided" }, 400);
+    }
+
+    const theme = await ctx.runQuery(api.functions.themes.data, {
+      id: themeId,
+    });
+
+    if (!theme) {
+      return replyJSON({ error: "Theme not found" }, 404);
+    }
+
+    return replyJSON(theme);
+  }),
+});
+
 export default http;
