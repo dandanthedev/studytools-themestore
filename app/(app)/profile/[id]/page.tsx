@@ -98,16 +98,16 @@ export default function Profile() {
         </Select>
       </div>
 
-      <div className="flex flex-col gap-4 p-3 items-center">
+      <div className="flex flex-wrap gap-4 p-3 items-center justify-center">
         {themes?.map((theme) => (
           <Theme
-            id={theme._id}
-            key={theme._id}
+            id={theme.id}
+            key={theme.id}
             name={theme.name}
             description={theme.description}
             data={theme.data}
-            preview={theme.preview}
-            canEdit={user.id === theme.user}
+            preview={"preview" in theme ? theme.preview : false}
+            canEdit={user.id === currentUser?.id}
           />
         ))}
       </div>

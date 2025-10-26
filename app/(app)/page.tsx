@@ -55,18 +55,15 @@ export default function Home() {
       </div>
       <div className="flex gap-3 flex-wrap justify-center p-3">
         {themes?.map((theme) => (
-          <div className="w-64 h-32" key={theme._id}>
+          <div className="w-64 h-32" key={theme.id}>
             <Theme
-              id={theme._id}
-              key={theme._id}
+              id={theme.id}
+              key={theme.id}
               name={theme.name}
               description={theme.description}
               data={theme.data}
-              user={{
-                id: theme.user,
-                name: theme.userName ?? "(Geen)",
-              }}
-              canEdit={user?.id === theme.user}
+              user={theme.user}
+              canEdit={theme.user.id === user?.id}
             />
           </div>
         ))}

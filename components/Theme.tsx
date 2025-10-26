@@ -19,7 +19,7 @@ export default function Theme({
   description: string;
   user?: {
     id: string;
-    name: string;
+    name?: string;
   };
   data: string;
   preview?: boolean;
@@ -34,7 +34,7 @@ export default function Theme({
       <p className="text-center text-muted-foreground text-md">{description}</p>
       {user && (
         <p className="text-center text-muted-foreground text-md">
-          door <Link href={`/profile/${user.id}`}>{user.name}</Link>
+          door <Link href={`/profile/${user.id}`}>{user.name ?? "(Geen)"}</Link>
         </p>
       )}
       <Button

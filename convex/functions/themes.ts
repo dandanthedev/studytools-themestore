@@ -1,7 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { Id } from "../_generated/dataModel";
 
 function wilsonScore(
   likes: number,
@@ -70,8 +69,11 @@ export const getByUser = query({
 
     if (!isMe)
       return themes.map((theme) => ({
-        ...theme,
-        preview: !theme.published,
+        id: theme._id,
+        name: theme.name,
+        description: theme.description,
+        data: theme.data,
+        preview: false,
       }));
     else {
       return await Promise.all(
@@ -81,7 +83,7 @@ export const getByUser = query({
             .withIndex("theme", (q) => q.eq("theme", theme._id))
             .first();
           return {
-            ...theme,
+            id: theme._id,
             name: theme.name || update?.name || "",
             description: theme.description || update?.description || "",
             data: theme.data || update?.data || "{}",
@@ -138,8 +140,14 @@ export const list = query({
     );
 
     return themes.map((theme, index) => ({
-      ...theme,
-      userName: users[index]?.name,
+      id: theme._id,
+      name: theme.name,
+      description: theme.description,
+      user: {
+        id: theme.user,
+        name: users[index]?.name,
+      },
+      data: theme.data,
     }));
   },
 });
