@@ -6,6 +6,7 @@ import {
   ThemeConfig,
   ThemeJSON,
 } from "@/lib/themes";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 function hslToStyle(hsl: { h: number; s: number; l: number }) {
   const h = hsl.h / 360;
@@ -13,6 +14,22 @@ function hslToStyle(hsl: { h: number; s: number; l: number }) {
   const l = hsl.l / 100;
   return `hsl(${h}, ${s * 100}%, ${l * 100}%)`;
 }
+
+function Loading() {
+  return (
+    <div className="flex flex-col items-center justify-center h-screen w-screen">
+      <Image
+        src="https://raw.githubusercontent.com/QkeleQ10/http-resources/main/study-tools/load-animation.svg"
+        alt="loading animation"
+        unoptimized
+        priority
+        width={50}
+        height={50}
+      />
+    </div>
+  );
+}
+
 export default function ThemePreview() {
   const [style, setStyle] = useState<ThemeJSON>();
   const [parsed, setParsed] = useState<ThemeConfig>();
@@ -34,8 +51,8 @@ export default function ThemePreview() {
     }
   }, [style]);
 
-  if (!style) return null;
-  if (!parsed) return null;
+  if (!style) return <Loading />;
+  if (!parsed) return <Loading />;
 
   const extraStyles = `
           .logo{
