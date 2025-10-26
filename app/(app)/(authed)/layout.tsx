@@ -26,6 +26,6 @@ function AuthHandlerLayout({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  if (!user) return <div>Laden...</div>;
+  if (!user) return null;
   return <>{children}</>;
 }
