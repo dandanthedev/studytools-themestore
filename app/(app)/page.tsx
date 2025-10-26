@@ -114,13 +114,7 @@ export default function Home() {
             ))}
           </div>
         </>
-      ) : themes === undefined ? (
-        /* Loading State */
-        <div className="flex flex-col items-center justify-center py-16">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-          <p className="text-muted-foreground">Laden...</p>
-        </div>
-      ) : (
+      ) : themes === undefined ? null : (
         /* Empty State */
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
