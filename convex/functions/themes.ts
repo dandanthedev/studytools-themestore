@@ -3,25 +3,6 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
-function wilsonScore(
-  likes: number,
-  dislikes: number,
-  downloads: number,
-  alpha: number = 0.03
-) {
-  const n = likes + dislikes + alpha * downloads;
-  if (n === 0) return 0;
-
-  const z = 1.96; // 95% confidence
-  const p = likes / n;
-  const numerator =
-    p +
-    (z * z) / (2 * n) -
-    z * Math.sqrt((p * (1 - p) + (z * z) / (4 * n)) / n);
-  const denominator = 1 + (z * z) / n;
-  return numerator / denominator;
-}
-
 export const getByUser = query({
   args: {
     userId: v.id("users"),
@@ -51,11 +32,7 @@ export const getByUser = query({
     } else if (args.sort === "rating") {
       const themesWithRatings = themes.map((theme) => ({
         ...theme,
-        rating: wilsonScore(
-          theme.likes.length,
-          theme.dislikes.length,
-          theme.downloads.length
-        ),
+        rating: theme.likes.length - theme.dislikes.length,
       }));
       themesWithRatings.sort((a, b) => b.rating - a.rating);
     } else if (args.sort === "date") {
@@ -64,7 +41,7 @@ export const getByUser = query({
       );
     }
 
-    if (args.order === "desc") {
+    if (args.order === "asc") {
       themes.reverse();
     }
 
@@ -122,11 +99,7 @@ export const list = query({
     } else if (args.sort === "rating") {
       const themesWithRatings = themes.map((theme) => ({
         ...theme,
-        rating: wilsonScore(
-          theme.likes.length,
-          theme.dislikes.length,
-          theme.downloads.length
-        ),
+        rating: theme.likes.length - theme.dislikes.length,
       }));
       themesWithRatings.sort((a, b) => b.rating - a.rating);
     } else if (args.sort === "date") {
@@ -135,7 +108,7 @@ export const list = query({
       );
     }
 
-    if (args.order === "desc") {
+    if (args.order === "asc") {
       themes.reverse();
     }
 
