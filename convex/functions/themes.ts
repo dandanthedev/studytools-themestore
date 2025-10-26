@@ -169,7 +169,7 @@ export const logDownload = mutation({
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      throw new ConvexError("Je bent niet ingelogd");
+      return null;
     }
 
     const theme = await ctx.db.get(args.id);
@@ -177,7 +177,7 @@ export const logDownload = mutation({
       throw new ConvexError("Thema niet gevonden");
     }
 
-    if (!theme.published) {
+    if (!theme.published && theme.user !== userId) {
       throw new ConvexError("Thema is niet gepubliceerd");
     }
 
