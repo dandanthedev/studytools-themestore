@@ -7,11 +7,11 @@ export const isAdmin = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) {
-      throw new ConvexError("Je bent niet ingelogd");
+      return false;
     }
     const user = await ctx.db.get(userId);
     if (!user) {
-      throw new ConvexError("Je bent niet ingelogd");
+      return false;
     }
 
     return user.isAdmin === true;
