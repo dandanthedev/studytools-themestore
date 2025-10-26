@@ -1,6 +1,5 @@
 "use client";
 
-import ThemePreview from "@/components/ThemePreview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -77,15 +76,7 @@ export default function Theme() {
   return (
     <div className="flex flex-col gap-4 justify-center items-center mt-3 w-full">
       <div className="w-80 h-42 relative">
-        <ThemePreview
-          style={JSON.parse(
-            theme?.data.live?.length && theme.data.live.length > 0
-              ? theme.data.live
-              : theme?.data.updated?.length && theme.data.updated.length > 0
-                ? theme.data.updated
-                : "{}"
-          )}
-        />
+        <iframe src={`/preview?id=${theme?.id}`} className="w-full h-full" />
       </div>
       <h1 className="text-3xl text-center text-foreground font-bold">
         {theme?.name.live || theme?.name.updated}

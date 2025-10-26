@@ -1,12 +1,16 @@
 "use client";
 
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import {
   DEFAULT_THEME,
   parseThemeJSON,
   ThemeConfig,
   ThemeJSON,
 } from "@/lib/themes";
+import { useQuery } from "convex/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 function hslToStyle(hsl: { h: number; s: number; l: number }) {
   const h = hsl.h / 360;
@@ -31,19 +35,12 @@ function Loading() {
 }
 
 export default function ThemePreview() {
-  const [style, setStyle] = useState<ThemeJSON>();
   const [parsed, setParsed] = useState<ThemeConfig>();
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.style) {
-        console.log("Received style:", event.data.style);
-        setStyle(event.data.style);
-      }
-    };
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  const params = useSearchParams();
+  const id = params.get("id");
+  const style = useQuery(api.functions.themes.data, {
+    id: id as Id<"themes">,
+  });
 
   useEffect(() => {
     if (style) {
@@ -73,7 +70,7 @@ export default function ThemePreview() {
       </style>
       <style>{extraStyles}</style>
       <div
-        className={`w-full h-full flex gap-2 p-3`}
+        className={`w-screen h-screen flex gap-2 p-3`}
         style={{
           backgroundColor: hslToStyle(
             parsed.pageColor || DEFAULT_THEME.pageColor

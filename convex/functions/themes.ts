@@ -1,3 +1,4 @@
+import { ThemeJSON } from "./../../lib/themes";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
@@ -167,6 +168,10 @@ export const logDownload = mutation({
       throw new ConvexError("Thema niet gevonden");
     }
 
+    if (!theme.published) {
+      throw new ConvexError("Thema is niet gepubliceerd");
+    }
+
     if (theme.downloads.includes(userId)) {
       return;
     }
@@ -174,5 +179,33 @@ export const logDownload = mutation({
     await ctx.db.patch(args.id, {
       downloads: [...theme.downloads, userId],
     });
+  },
+});
+
+export const data = query({
+  args: {
+    id: v.id("themes"),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    const theme = await ctx.db.get(args.id);
+    if (!theme) {
+      throw new ConvexError("Theme niet gevonden");
+    }
+    if (!theme.published) {
+      throw new ConvexError("Thema is niet gepubliceerd");
+    }
+
+    if (theme.user === userId) {
+      const update = await ctx.db
+        .query("themeUpdates")
+        .withIndex("theme", (q) => q.eq("theme", args.id))
+        .first();
+      if (update && update.data) {
+        return JSON.parse(update.data);
+      }
+    }
+
+    return theme.data.length > 0 ? JSON.parse(theme.data) : ({} as ThemeJSON);
   },
 });

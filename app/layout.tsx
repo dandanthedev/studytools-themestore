@@ -20,29 +20,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  if (pathname === "/preview")
-    return (
-      <html>
-        <body
-          style={{
-            height: "100vh",
-          }}
-        >
-          {children}
-        </body>
-      </html>
-    );
+  const preview = pathname === "/preview";
 
   return (
     <html lang="en">
       <body className={`${roboto.className} antialiased min-h-screen`}>
         <ConvexAuthProvider client={convex}>
-          <Header />
+          {!preview && <Header />}
+
           {children}
-          <p className="fixed bottom-2 left-0 right-0 text-center text-sm text-muted-foreground">
-            De StudyTools Marketplace is een onofficieel community-project en is
-            dus niet gelinked aan Quinten of StudyTools in het algemeen.
-          </p>
+          {!preview && (
+            <p className="fixed bottom-2 left-0 right-0 text-center text-sm text-muted-foreground">
+              De StudyTools Marketplace is een onofficieel community-project en
+              is dus niet gelinked aan Quinten of StudyTools in het algemeen.
+            </p>
+          )}
         </ConvexAuthProvider>
       </body>
     </html>
