@@ -6,7 +6,7 @@ import { DEFAULT_THEME, parseThemeJSON, ThemeConfig } from "@/lib/themes";
 import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 function hslToStyle(hsl: { h: number; s: number; l: number }) {
   const h = hsl.h / 360;
   const s = hsl.s / 100;
@@ -29,7 +29,15 @@ function Loading() {
   );
 }
 
-export default function ThemePreview() {
+export default function ThemePreviewWrapper() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ThemePreview />
+    </Suspense>
+  );
+}
+
+function ThemePreview() {
   const [parsed, setParsed] = useState<ThemeConfig>();
   const params = useSearchParams();
   const id = params.get("id");
