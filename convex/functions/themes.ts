@@ -2,7 +2,52 @@ import { ThemeJSON } from "./../../lib/themes";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { Id } from "../_generated/dataModel";
+// --- Shared sorting helper ---
+function sortThemes(
+  themes: {
+    downloads: string[];
+    likes: string[];
+    dislikes: string[];
+    updatedAt?: number;
+    _id: Id<"themes">;
+    name: string;
+    description: string;
+    data: string;
+    published: boolean;
+    user: Id<"users">;
+  }[],
+  sort: string,
+  order: string
+) {
+  // Clone so we don't mutate the original array
+  const sorted = [...themes];
 
+  if (sort === "downloads") {
+    // ascending by downloads
+    sorted.sort((a, b) => a.downloads.length - b.downloads.length);
+  } else if (sort === "rating") {
+    // ascending by rating (likes - dislikes)
+    sorted.sort(
+      (a, b) =>
+        a.likes.length -
+        a.dislikes.length -
+        (b.likes.length - b.dislikes.length)
+    );
+  } else if (sort === "date") {
+    // ascending by updated date (oldest first)
+    sorted.sort((a, b) => (a?.updatedAt || 0) - (b?.updatedAt || 0));
+  }
+
+  // Reverse if descending order requested
+  if (order === "desc") {
+    sorted.reverse();
+  }
+
+  return sorted;
+}
+
+// --- getByUser query ---
 export const getByUser = query({
   args: {
     userId: v.id("users"),
@@ -16,6 +61,7 @@ export const getByUser = query({
   handler: async (ctx, args) => {
     const userId = (await getAuthUserId(ctx)) || null;
     const isMe = userId === args.userId;
+
     const themes = isMe
       ? await ctx.db
           .query("themes")
@@ -27,26 +73,12 @@ export const getByUser = query({
           .filter((q) => q.eq(q.field("published"), true))
           .collect();
 
-    if (args.sort === "downloads") {
-      themes.sort((a, b) => b.downloads.length - a.downloads.length);
-    } else if (args.sort === "rating") {
-      const themesWithRatings = themes.map((theme) => ({
-        ...theme,
-        rating: theme.likes.length - theme.dislikes.length,
-      }));
-      themesWithRatings.sort((a, b) => b.rating - a.rating);
-    } else if (args.sort === "date") {
-      themes.sort(
-        (a, b) => (a?.updatedAt || Date.now()) - (b?.updatedAt || Date.now())
-      );
-    }
+    // Apply shared sorting
+    const filteredThemes = sortThemes(themes, args.sort, args.order);
 
-    if (args.order === "asc") {
-      themes.reverse();
-    }
-
-    if (!isMe)
-      return themes.map((theme) => ({
+    if (!isMe) {
+      // Public view
+      return filteredThemes.map((theme) => ({
         id: theme._id,
         name: theme.name,
         description: theme.description,
@@ -56,13 +88,15 @@ export const getByUser = query({
         dislikes: theme.dislikes.length,
         downloads: theme.downloads.length,
       }));
-    else {
+    } else {
+      // Owner view
       return await Promise.all(
-        themes.map(async (theme) => {
+        filteredThemes.map(async (theme) => {
           const update = await ctx.db
             .query("themeUpdates")
             .withIndex("theme", (q) => q.eq("theme", theme._id))
             .first();
+
           return {
             id: theme._id,
             name: theme.name || update?.name || "",
@@ -79,6 +113,7 @@ export const getByUser = query({
   },
 });
 
+// --- list query ---
 export const list = query({
   args: {
     sort: v.union(
@@ -94,32 +129,19 @@ export const list = query({
       .filter((q) => q.eq(q.field("published"), true))
       .collect();
 
-    if (args.sort === "downloads") {
-      themes.sort((a, b) => b.downloads.length - a.downloads.length);
-    } else if (args.sort === "rating") {
-      const themesWithRatings = themes.map((theme) => ({
-        ...theme,
-        rating: theme.likes.length - theme.dislikes.length,
-      }));
-      themesWithRatings.sort((a, b) => b.rating - a.rating);
-    } else if (args.sort === "date") {
-      themes.sort(
-        (a, b) => (a?.updatedAt || Date.now()) - (b?.updatedAt || Date.now())
-      );
-    }
+    // Apply shared sorting
+    const filteredThemes = sortThemes(themes, args.sort, args.order);
 
-    if (args.order === "asc") {
-      themes.reverse();
-    }
-
+    // Attach user info
     const users = await Promise.all(
-      themes.map(async (theme) => {
+      filteredThemes.map(async (theme) => {
         const user = await ctx.db.get(theme.user);
         return user;
       })
     );
 
-    return themes.map((theme, index) => ({
+    // Return formatted results
+    return filteredThemes.map((theme, index) => ({
       id: theme._id,
       name: theme.name,
       description: theme.description,
