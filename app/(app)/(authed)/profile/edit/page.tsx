@@ -40,7 +40,7 @@ export default function Setup() {
 
           if (file) {
             const res = await fetch(
-              `${process.env.NEXT_PUBLIC_CONVEX_FUNCTIONS}/updatePicture`,
+              `${process.env.NEXT_PUBLIC_CONVEX_SITE_URL}/updatePicture`,
               {
                 method: "POST",
                 body: file,
