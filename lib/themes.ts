@@ -44,6 +44,7 @@ export interface ThemeJSON {
   "decoration-size"?: number | string;
   "darken-content"?: boolean | string;
   "custom-css"?: string;
+  "custom-css2"?: string;
 }
 
 // Default theme values

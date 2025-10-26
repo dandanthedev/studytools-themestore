@@ -68,7 +68,10 @@ export default function ThemePreview() {
 
   return (
     <>
-      <style>{style["custom-css"] || ""}</style>
+      <style>
+        {style["custom-css"] || ""}
+        {style["custom-css2"] || ""}
+      </style>
       <style>{extraStyles}</style>
       <div
         className={`w-full h-full flex gap-2 p-3`}
