@@ -29,9 +29,7 @@ export default function Theme({
   const logDownload = useMutation(api.functions.themes.logDownload);
   return (
     <div className="flex flex-col gap-4 bg-secondary items-center max-w-67 p-2 rounded-lg border">
-      <div className="w-64 h-32">
-        <ThemePreview style={parsed} />
-      </div>
+      <ThemePreview style={parsed} />
       <h1 className="text-3xl text-center text-foreground font-bold">{name}</h1>
       <p className="text-center text-muted-foreground text-md">{description}</p>
       {user && (

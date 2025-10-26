@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import Header from "@/components/Header";
 import { ConvexReactClient } from "convex/react";
+import { usePathname } from "next/navigation";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -18,6 +19,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  if (pathname === "/preview")
+    return (
+      <html>
+        <body
+          style={{
+            height: "100vh",
+          }}
+        >
+          {children}
+        </body>
+      </html>
+    );
+
   return (
     <html lang="en">
       <body className={`${roboto.className} antialiased min-h-screen`}>

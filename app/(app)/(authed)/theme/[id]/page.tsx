@@ -76,7 +76,7 @@ export default function Theme() {
 
   return (
     <div className="flex flex-col gap-4 justify-center items-center mt-3 w-full">
-      <div className="w-64 h-32">
+      <div className="w-80 h-42 relative">
         <ThemePreview
           style={JSON.parse(
             theme?.data.live?.length && theme.data.live.length > 0
