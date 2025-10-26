@@ -201,7 +201,7 @@ export const data = query({
     if (!theme) {
       throw new ConvexError("Theme niet gevonden");
     }
-    if (!theme.published) {
+    if (!theme.published && theme.user !== userId) {
       throw new ConvexError("Thema is niet gepubliceerd");
     }
 
