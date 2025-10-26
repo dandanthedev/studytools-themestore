@@ -69,8 +69,7 @@ export default function ThemePreview() {
   return (
     <>
       <style>
-        {style["custom-css"] || ""}
-        {style["custom-css2"] || ""}
+        {(style["custom-css"] || "") + (style["custom-css2"] || "")}
       </style>
       <style>{extraStyles}</style>
       <div
