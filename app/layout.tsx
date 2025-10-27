@@ -1,4 +1,5 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
@@ -6,7 +7,7 @@ import Header from "@/components/Header";
 import { ConvexReactClient } from "convex/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Github } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -23,6 +24,21 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const preview = pathname === "/preview";
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!preview) {
+      const seen = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("stm_seenDisclaimer="));
+      if (!seen) setOpen(true);
+    }
+  }, [preview]);
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) {
+      document.cookie = "stm_seenDisclaimer=1; max-age=31536000; path=/";
+    }
+  };
 
   return (
     <html lang="en">
@@ -30,22 +46,21 @@ export default function RootLayout({
         <ConvexAuthProvider client={convex}>
           {!preview && <Header />}
 
+          <Dialog open={open} onOpenChange={handleOpenChange}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Let op</DialogTitle>
+                <DialogDescription>
+                  De StudyTools Marketplace is een onofficieel community-project en is dus niet gelinked aan Quinten of StudyTools in het algemeen.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button onClick={() => handleOpenChange(false)}>Ik begrijp het</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           {children}
-          {!preview && (
-            <div className="fixed bottom-2 left-0 right-0  flex flex-col gap-2 items-center justify-center">
-              <p className="text-center text-sm text-muted-foreground">
-                De StudyTools Marketplace is een onofficieel community-project
-                en is dus niet gelinked aan Quinten of StudyTools in het
-                algemeen.{" "}
-              </p>{" "}
-              <a
-                href="https://github.com/dandanthedev/studytools-themestore"
-                target="_blank"
-              >
-                <Github color="black" size={20} />
-              </a>
-            </div>
-          )}
         </ConvexAuthProvider>
       </body>
     </html>
