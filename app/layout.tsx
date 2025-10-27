@@ -27,18 +27,10 @@ export default function RootLayout({
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!preview) {
-      const seen = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("stm_seenDisclaimer="));
+      const seen = localStorage.getItem("stm_seenDisclaimer");
       if (!seen) setOpen(true);
     }
   }, [preview]);
-  const handleOpenChange = (nextOpen: boolean) => {
-    setOpen(nextOpen);
-    if (!nextOpen) {
-      document.cookie = "stm_seenDisclaimer=1; max-age=31536000; path=/";
-    }
-  };
 
   return (
     <html lang="en">
@@ -46,7 +38,15 @@ export default function RootLayout({
         <ConvexAuthProvider client={convex}>
           {!preview && <Header />}
 
-          <Dialog open={open} onOpenChange={handleOpenChange}>
+          <Dialog
+            open={open}
+            onOpenChange={(nextOpen) => {
+              setOpen(nextOpen);
+              if (!nextOpen) {
+                localStorage.setItem("stm_seenDisclaimer", "1");
+              }
+            }}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Let op</DialogTitle>
@@ -55,7 +55,14 @@ export default function RootLayout({
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
-                <Button onClick={() => handleOpenChange(false)}>Ik begrijp het</Button>
+                <Button
+                  onClick={() => {
+                    setOpen(false);
+                    localStorage.setItem("stm_seenDisclaimer", "1");
+                  }}
+                >
+                  Ik begrijp het
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
