@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+<img src="https://github.com/dandanthedev/studytools-themestore/blob/main/public/logo.png?raw=true" alt="Studytools Logo" width="200">
+<h1>StudyTools ThemeStore</h1>
+<p>Een thema marketplace voor <a href="https://qkeleq10.github.io/studytools">StudyTools</a></p>
+</div>
 
-## Getting Started
+## Installeren
+1. Clone de repo
+2. Installeer de dependencies met `bun install`. Hiervoor moet je [Bun](https://bun.sh/) geinstalleerd hebben.
+3. Start de frontend met `bun run dev`.
+4. Open een nieuwe terminal en start de backend met `bunx convex dev --local`.
+5. Wacht totdat de backend is opgestart en open hierna nog een nieuwe terminal.
+6. Voer `bunx @convex-dev/auth` uit en volg de instructies om de auth environment in te stellen.
+7. Stel een [Resend](https://resend.com/api-keys) key in met `bunx convex env set AUTH_RESEND_KEY <key>`. (Deze key is voor nu nog verplicht, in de toekomst komt er een bypass voor dev environments)
+8. Sluit de terminal waar je net de auth en resend key hebt ingesteld. Je hebt nu de frontend en de backend opgestart.
 
-First, run the development server:
+## Opstarten
+Na installatie kan je de frontend en de backend op de volgende manier starten:
+- Frontend: `bun run dev`
+- Backend: `bunx convex dev --local`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Je kunt de database beheren op `https://dashboard.convex.dev`.
