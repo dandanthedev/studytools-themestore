@@ -6,18 +6,18 @@
 
 ## Installeren
 1. Clone de repo
-2. Installeer de dependencies met `bun install`. Hiervoor moet je [Bun](https://bun.sh/) geinstalleerd hebben.
-3. Start de frontend met `bun run dev`.
-4. Open een nieuwe terminal en start de backend met `bunx convex dev --local`.
+2. Installeer de dependencies met `npm install`. Hiervoor moet je [Node](https://nodejs.org/) geinstalleerd hebben.
+3. Start de frontend met `npm run dev`.
+4. Open een nieuwe terminal en start de backend met `npx convex dev --local`.
 5. Wacht totdat de backend is opgestart en open hierna nog een nieuwe terminal.
-6. Voer `bunx @convex-dev/auth` uit en volg de instructies om de auth environment in te stellen.
-7. Stel een [Resend](https://resend.com/api-keys) key in met `bunx convex env set AUTH_RESEND_KEY <key>`. (Deze key is voor nu nog verplicht, in de toekomst komt er een bypass voor dev environments)
+6. Voer `npx @convex-dev/auth` uit en volg de instructies om de auth environment in te stellen.
+7. Stel een [Resend](https://resend.com/api-keys) key in met `npx convex env set AUTH_RESEND_KEY <key>`. (Deze key is voor nu nog verplicht, in de toekomst komt er een bypass voor dev environments)
 8. Sluit de terminal waar je net de auth en resend key hebt ingesteld. Je hebt nu de frontend en de backend opgestart.
 
 ## Opstarten
 Na installatie kan je de frontend en de backend op de volgende manier starten:
-- Frontend: `bun run dev`
-- Backend: `bunx convex dev --local`
+- Frontend: `npm run dev`
+- Backend: `npx convex dev --local`
 
 Je kunt de database beheren op `https://dashboard.convex.dev`.
 
