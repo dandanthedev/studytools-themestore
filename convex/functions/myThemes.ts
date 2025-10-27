@@ -185,25 +185,16 @@ export const notifyMe = internalAction({
       },
     };
 
-    try {
-      const res = await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: "[@everyone]",
-          embeds: [embed],
-        }),
-      });
-
-      const data = await res.json();
-      console.log("Discord webhook response:", data);
-      return data;
-    } catch (err) {
-      console.error("Failed to send Discord webhook:", err);
-      throw err;
-    }
+    await fetch(process.env.DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: "[@everyone]",
+        embeds: [embed],
+      }),
+    });
   },
 });
 
