@@ -150,7 +150,11 @@ export default function Profile() {
       {/* Profile Header */}
       <div className="flex flex-col items-center mb-8">
         <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-lg">
-          <AvatarImage src={user.image || undefined} alt={user.name} />
+          <AvatarImage
+            src={user.image || undefined}
+            alt={user.name}
+            className="object-cover"
+          />
           <AvatarFallback className="text-3xl">
             {user.name ? user.name.charAt(0).toUpperCase() : "?"}
           </AvatarFallback>
