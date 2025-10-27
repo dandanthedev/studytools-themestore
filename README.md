@@ -20,3 +20,9 @@ Na installatie kan je de frontend en de backend op de volgende manier starten:
 - Backend: `bunx convex dev --local`
 
 Je kunt de database beheren op `https://dashboard.convex.dev`.
+
+# Architecture
+
+De frontend is gebouwd met [Next.js](https://nextjs.org/). We maken gebruik van app router. Dit is te vinden in de `app` folder.
+
+De backend is gebouwd met [Convex](https://convex.dev/). De backend routes kun je vinden in de `convex/functions` folder.
