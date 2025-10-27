@@ -34,11 +34,10 @@ import {
   ArrowUpNarrowWide,
   Package,
   Settings,
-  CircleCheck,
   AlertCircle,
-  Shield,
   CheckCircle2,
 } from "lucide-react";
+import UserBadge from "@/components/UserBadge";
 
 export default function Profile() {
   const params = useParams();
@@ -158,17 +157,8 @@ export default function Profile() {
         </Avatar>
 
         <div className="text-4xl font-bold mb-2 flex items-center gap-2">
-          {user.name}{" "}
-          {user.role === "admin" && (
-            <div title="Admin">
-              <Shield />
-            </div>
-          )}
-          {user.role === "trusted" && (
-            <div title="Geverifieerd">
-              <CircleCheck />
-            </div>
-          )}
+          {user.name}
+          <UserBadge role={user.role} />
         </div>
 
         {themes && (

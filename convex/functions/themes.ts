@@ -148,6 +148,7 @@ export const list = query({
       user: {
         id: theme.user,
         name: users[index]?.name,
+        role: users[index]?.role,
       },
       data: theme.data,
       likes: theme.likes.length,

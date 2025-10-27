@@ -7,7 +7,15 @@ import { ThumbsUp, ThumbsDown, Download, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import UserBadge from "./UserBadge";
 
 export default function Theme({
   theme,
@@ -21,6 +29,7 @@ export default function Theme({
     user?: {
       id: string;
       name?: string;
+      role?: "admin" | "trusted";
     };
     data: string;
     preview?: boolean;
@@ -81,10 +90,15 @@ export default function Theme({
         {theme.user && (
           <Link
             href={`/profile/${theme.user.id}`}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors w-fit"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors w-fit flex items-center"
           >
-            door{" "}
-            <span className="font-medium">{theme.user.name ?? "(Geen)"}</span>
+            <div className="flex items-center gap-1">
+              door{" "}
+              <span className="font-medium">{theme.user.name ?? "(Geen)"}</span>
+              <div className="w-4 h-4">
+                <UserBadge role={theme.user.role} size={16} />
+              </div>
+            </div>
           </Link>
         )}
 
