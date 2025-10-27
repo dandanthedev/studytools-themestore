@@ -5,6 +5,9 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { ThumbsUp, ThumbsDown, Download, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 
 export default function Theme({
   theme,
@@ -42,6 +45,10 @@ export default function Theme({
 
   const hasLiked = userRatingStatus === "like";
   const hasDisliked = userRatingStatus === "dislike";
+
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false);
+  const pathname = usePathname();
+  const loginHref = `/auth/login?redirect=${encodeURIComponent(pathname)}`;
 
   return (
     <div className="group relative flex flex-col overflow-hidden bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-200">
@@ -115,7 +122,7 @@ export default function Theme({
         <div className="flex gap-2">
           {/* Like Button */}
           <Button
-            disabled={!signedIn}
+            disabled={signedIn === undefined}
             variant={hasLiked ? "default" : "outline"}
             size="sm"
             className={cn(
@@ -124,6 +131,10 @@ export default function Theme({
                 "bg-green-600 hover:bg-green-700 text-white border-green-600"
             )}
             onClick={() => {
+              if (!signedIn) {
+                setLoginPromptOpen(true);
+                return;
+              }
               rate({ id: theme.id, status: "like" });
             }}
           >
@@ -133,7 +144,7 @@ export default function Theme({
 
           {/* Dislike Button */}
           <Button
-            disabled={!signedIn}
+            disabled={signedIn === undefined}
             variant={hasDisliked ? "default" : "outline"}
             size="sm"
             className={cn(
@@ -142,6 +153,10 @@ export default function Theme({
                 "bg-red-600 hover:bg-red-700 text-white border-red-600"
             )}
             onClick={() => {
+              if (!signedIn) {
+                setLoginPromptOpen(true);
+                return;
+              }
               rate({ id: theme.id, status: "dislike" });
             }}
           >
@@ -181,6 +196,24 @@ export default function Theme({
           </Link>
         )}
       </div>
+      <Dialog open={loginPromptOpen} onOpenChange={setLoginPromptOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Inloggen vereist</DialogTitle>
+            <DialogDescription>
+              Log in om te kunnen liken of disliken.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLoginPromptOpen(false)}>
+              Annuleren
+            </Button>
+            <Button asChild>
+              <Link href={loginHref}>Inloggen</Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
