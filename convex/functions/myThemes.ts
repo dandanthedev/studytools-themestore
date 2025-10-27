@@ -152,6 +152,7 @@ export const notifyMe = internalAction({
     status: v.boolean(),
   },
   handler: async (ctx, args) => {
+    if (!process.env.DISCORD_TOKEN || !process.env.DISCORD_CHANNEL_ID) return;
     await fetch(
       "https://discord.com/api/channels/" +
         process.env.DISCORD_CHANNEL_ID +
