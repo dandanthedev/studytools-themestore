@@ -37,7 +37,11 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <button aria-label="Account menu">
                 <Avatar className="size-12">
-                  <AvatarImage src={user.image || undefined} alt={user.name} />
+                  <AvatarImage
+                    src={user.image || undefined}
+                    alt={user.name}
+                    className="object-cover"
+                  />
                   <AvatarFallback>
                     {user.name ? user.name.charAt(0) : "?"}
                   </AvatarFallback>
