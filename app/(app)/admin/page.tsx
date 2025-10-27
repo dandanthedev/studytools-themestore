@@ -17,7 +17,7 @@ export default function Admin() {
 
   if (isAdmin === undefined) return null;
   if (isAdmin === null) return <p>Je hebt geen toegang tot deze pagina</p>;
-  return <AdminInner />;
+  if (isAdmin) return <AdminInner />;
 }
 
 function download(id: string, data: string) {

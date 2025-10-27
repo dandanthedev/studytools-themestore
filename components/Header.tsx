@@ -6,12 +6,18 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
-import { Github, LogOut, Plus, User } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Github, LogOut, Plus, Shield, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { useAuthActions } from "@convex-dev/auth/react";
 
 export default function Header() {
   const user = useQuery(api.functions.user.get);
+  const isAdmin = useQuery(api.functions.admin.isAdmin);
   const { signOut } = useAuthActions();
   return (
     <div className="flex flex-row justify-between p-4 bg-primary items-center">
@@ -48,6 +54,14 @@ export default function Header() {
                   Profiel
                 </Link>
               </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin" className="flex items-center gap-2">
+                    <Shield className="size-4" />
+                    Admin
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild>
                 <Link href="/create" className="flex items-center gap-2">
                   <Plus className="size-4" />
