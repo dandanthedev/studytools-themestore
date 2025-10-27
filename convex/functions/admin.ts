@@ -1,6 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { mutation, query } from "../_generated/server";
+import { internalMutation, mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
+import { internal } from "../_generated/api";
 
 export const isAdmin = query({
   args: {},
@@ -14,7 +15,7 @@ export const isAdmin = query({
       return false;
     }
 
-    return user.isAdmin === true;
+    return user.role === "admin";
   },
 });
 
@@ -30,7 +31,7 @@ export const themesToReview = query({
       throw new ConvexError("Je bent niet ingelogd");
     }
 
-    if (!user.isAdmin) throw new ConvexError("Je bent geen admin");
+    if (user.role !== "admin") throw new ConvexError("Je bent geen admin");
 
     const updates = await ctx.db
       .query("themeUpdates")
@@ -76,14 +77,34 @@ export const sendResponse = mutation({
         sentForApproval: false,
       });
     } else {
-      await ctx.db.patch(update.theme, {
-        name: update.name,
-        description: update.description,
-        data: update.data,
-        updateNote: args.reason,
-        updatedAt: Date.now(),
+      await ctx.runMutation(internal.functions.admin.acceptTheme, {
+        id: args.id,
       });
-      await ctx.db.delete(args.id);
     }
+  },
+});
+
+export const acceptTheme = internalMutation({
+  args: {
+    id: v.id("themeUpdates"),
+  },
+  handler: async (ctx, args) => {
+    const update = await ctx.db.get(args.id);
+    if (!update) {
+      throw new ConvexError("Update niet gevonden");
+    }
+    console.log(update);
+
+    const edits: Record<string, string> = {};
+    if (update.name) edits.name = update.name;
+    if (update.description) edits.description = update.description;
+    if (update.data) edits.data = update.data;
+
+    await ctx.db.patch(update.theme, {
+      ...edits,
+      updateNote: "Automatisch goedgekeurd op " + new Date().toLocaleString(),
+      updatedAt: Date.now(),
+    });
+    await ctx.db.delete(args.id);
   },
 });

@@ -139,10 +139,17 @@ export const sendForApproval = mutation({
       updateNote: "",
     });
 
-    await ctx.scheduler.runAfter(0, internal.functions.myThemes.notifyMe, {
-      themeName: theme.name,
-      status: args.status,
-    });
+    const user = await ctx.db.get(userId);
+    if (user && (user.role === "admin" || user.role === "trusted")) {
+      await ctx.runMutation(internal.functions.admin.acceptTheme, {
+        id: existingUpdate._id,
+      });
+    } else {
+      await ctx.scheduler.runAfter(0, internal.functions.myThemes.notifyMe, {
+        themeName: theme.name,
+        status: args.status,
+      });
+    }
   },
 });
 

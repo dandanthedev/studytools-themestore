@@ -108,6 +108,7 @@ export const getById = query({
       id: user._id,
       name: user.name,
       image: imageURL,
+      role: user.role,
     };
   },
 });

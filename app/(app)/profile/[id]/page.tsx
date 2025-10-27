@@ -34,8 +34,10 @@ import {
   ArrowUpNarrowWide,
   Package,
   Settings,
-  CheckCircle2,
+  CircleCheck,
   AlertCircle,
+  Shield,
+  CheckCircle2,
 } from "lucide-react";
 
 export default function Profile() {
@@ -155,7 +157,19 @@ export default function Profile() {
           </AvatarFallback>
         </Avatar>
 
-        <h1 className="text-4xl font-bold mb-2">{user.name}</h1>
+        <div className="text-4xl font-bold mb-2 flex items-center gap-2">
+          {user.name}{" "}
+          {user.role === "admin" && (
+            <div title="Admin">
+              <Shield />
+            </div>
+          )}
+          {user.role === "trusted" && (
+            <div title="Geverifieerd">
+              <CircleCheck />
+            </div>
+          )}
+        </div>
 
         {themes && (
           <p className="text-muted-foreground text-lg">

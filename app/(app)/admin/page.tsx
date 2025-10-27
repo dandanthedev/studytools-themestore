@@ -16,7 +16,10 @@ export default function Admin() {
   const isAdmin = useQuery(api.functions.admin.isAdmin);
 
   if (isAdmin === undefined) return null;
-  if (isAdmin === null) return <p>Je hebt geen toegang tot deze pagina</p>;
+  if (isAdmin === false)
+    return (
+      <p className="text-center mt-2">Je hebt geen toegang tot deze pagina</p>
+    );
   if (isAdmin) return <AdminInner />;
 }
 
