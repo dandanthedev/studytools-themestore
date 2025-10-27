@@ -63,7 +63,7 @@ http.route({
 });
 
 http.route({
-  path: "/previewData",
+  path: "/themeData",
   method: "OPTIONS",
   handler: httpAction(async () => {
     return new Response(null, {
@@ -73,24 +73,27 @@ http.route({
 });
 
 http.route({
-  path: "/previewData",
+  path: "/themeData",
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     const urlParsed = new URL(request.url);
     const themeId = urlParsed.searchParams.get("id") as Id<"themes">;
+    const prod = urlParsed.searchParams.get("prod") as string;
+    const prodBool = prod === "true";
     if (!themeId) {
       return replyJSON({ error: "No theme id provided" }, 400);
     }
 
-    const theme = await ctx.runQuery(api.functions.themes.data, {
-      id: themeId,
-    });
+    try {
+      const theme = await ctx.runQuery(api.functions.themes.data, {
+        id: themeId,
+        prod: prodBool,
+      });
 
-    if (!theme) {
+      return replyJSON(theme);
+    } catch {
       return replyJSON({ error: "Theme not found" }, 404);
     }
-
-    return replyJSON(theme);
   }),
 });
 

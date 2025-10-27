@@ -190,6 +190,7 @@ export const logDownload = mutation({
 export const data = query({
   args: {
     id: v.id("themes"),
+    prod: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -201,7 +202,7 @@ export const data = query({
       throw new ConvexError("Thema is niet gepubliceerd");
     }
 
-    if (theme.user === userId) {
+    if (theme.user === userId && !args.prod) {
       const update = await ctx.db
         .query("themeUpdates")
         .withIndex("theme", (q) => q.eq("theme", args.id))

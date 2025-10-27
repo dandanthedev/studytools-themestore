@@ -1,7 +1,5 @@
 "use client";
 
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import {
   DEFAULT_THEME,
   parseThemeJSON,
@@ -9,7 +7,6 @@ import {
   ThemeJSON,
 } from "@/lib/themes";
 import { useAuthToken } from "@convex-dev/auth/react";
-import { useQuery } from "convex/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -49,22 +46,26 @@ function ThemePreview() {
   const [parsed, setParsed] = useState<ThemeConfig>();
   const params = useSearchParams();
   const id = params.get("id");
+  const prod = params.get("prod");
   const [style, setStyle] = useState<ThemeJSON>();
 
   useEffect(() => {
     if (id) {
       //todo: this still opens convex websocket
-      fetch(`${process.env.NEXT_PUBLIC_CONVEX_SITE_URL}/previewData?id=${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      fetch(
+        `${process.env.NEXT_PUBLIC_CONVEX_SITE_URL}/themeData?id=${id}&prod=${prod === "true"}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           setStyle(data);
         });
     }
-  }, [id, token]);
+  }, [id, token, prod]);
 
   useEffect(() => {
     if (style) {

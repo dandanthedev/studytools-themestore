@@ -110,6 +110,7 @@ export default function Home() {
                 key={theme.id}
                 theme={theme}
                 canEdit={theme.user.id === user?.id}
+                prod={true}
               />
             ))}
           </div>

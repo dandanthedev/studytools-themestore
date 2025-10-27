@@ -323,6 +323,7 @@ export default function Profile() {
                 theme={theme}
                 preview={"preview" in theme ? theme.preview : false}
                 canEdit={isOwnProfile}
+                prod={"preview" in theme ? !theme.preview : true}
               />
             ))}
           </div>

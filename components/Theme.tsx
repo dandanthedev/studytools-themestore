@@ -21,6 +21,7 @@ export default function Theme({
   theme,
   preview,
   canEdit,
+  prod,
 }: {
   theme: {
     id: Id<"themes">;
@@ -40,6 +41,7 @@ export default function Theme({
   };
   preview?: boolean;
   canEdit?: boolean;
+  prod?: boolean;
 }) {
   const logDownload = useMutation(api.functions.themes.logDownload);
   const userRatingStatus = useQuery(api.functions.themes.userRatingStatus, {
@@ -64,7 +66,7 @@ export default function Theme({
       {/* Preview Section */}
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
         <iframe
-          src={`/preview?id=${theme.id}`}
+          src={`/preview?id=${theme.id}&prod=${prod}`}
           className="w-full h-full border-0"
         />
         {preview && (
