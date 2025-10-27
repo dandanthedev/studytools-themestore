@@ -146,48 +146,64 @@ export const sendForApproval = mutation({
       });
     } else {
       await ctx.scheduler.runAfter(0, internal.functions.myThemes.notifyMe, {
-        themeName: theme.name,
+        //o wat prachtig
+        themeName:
+          theme.name.length > 0
+            ? theme.name
+            : existingUpdate?.name && existingUpdate.name.length > 0
+              ? existingUpdate.name
+              : "(Geen)",
         status: args.status,
       });
     }
   },
 });
-
 export const notifyMe = internalAction({
   args: {
     themeName: v.string(),
     status: v.boolean(),
   },
   handler: async (ctx, args) => {
-    if (!process.env.DISCORD_TOKEN || !process.env.DISCORD_CHANNEL_ID) return;
-    await fetch(
-      "https://discord.com/api/channels/" +
-        process.env.DISCORD_CHANNEL_ID +
-        "/messages",
-      {
+    if (!process.env.DISCORD_WEBHOOK_URL) return;
+
+    const color = args.status ? 0x57f287 : 0xed4245; // green for sent, red for withdrawn
+    const statusText = args.status
+      ? "✅ Review ingestuurd"
+      : "❌ Review ingetrokken";
+
+    const embed = {
+      title: statusText,
+      url: process.env.SITE_URL + "/admin",
+      description: `**Thema:** ${args.themeName}`,
+      color,
+
+      timestamp: new Date().toISOString(),
+      thumbnail: {
+        url: args.status
+          ? "https://cdn-icons-png.flaticon.com/512/845/845646.png"
+          : "https://cdn-icons-png.flaticon.com/512/1828/1828843.png",
+      },
+    };
+
+    try {
+      const res = await fetch(process.env.DISCORD_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bot " + process.env.DISCORD_TOKEN,
         },
         body: JSON.stringify({
-          embeds: [
-            {
-              description: `Review status ${args.status ? "ingestuurd" : "ingetrokken"} voor ${args.themeName}`,
-              color: 0x00ff00,
-              author: {
-                name: "StudyTools",
-              },
-            },
-          ],
+          content: "[@everyone]",
+          embeds: [embed],
         }),
-      }
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        return res;
       });
+
+      const data = await res.json();
+      console.log("Discord webhook response:", data);
+      return data;
+    } catch (err) {
+      console.error("Failed to send Discord webhook:", err);
+      throw err;
+    }
   },
 });
 
