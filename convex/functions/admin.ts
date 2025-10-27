@@ -104,6 +104,7 @@ export const acceptTheme = internalMutation({
       ...edits,
       updateNote: "Automatisch goedgekeurd op " + new Date().toLocaleString(),
       updatedAt: Date.now(),
+      published: true,
     });
     await ctx.db.delete(args.id);
   },
