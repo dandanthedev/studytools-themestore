@@ -33,7 +33,7 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
   }, [user, router, pathname, setupComplete, search]);
 
   return (
-    <div className="flex items-center justify-center h-[calc(100vh-74px)] w-full bg-primary">
+    <div className="flex items-center justify-center h-[calc(100vh-74px)] w-full bg-primary dark:bg-secondary">
       <div className="rounded-lg bg-card p-4 w-full max-w-md flex flex-col justify-center gap-4">
         {children}
       </div>
