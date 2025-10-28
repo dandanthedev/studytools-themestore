@@ -6,7 +6,7 @@ import { api } from "@/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
-import { Github, LogOut, Plus, Shield, User } from "lucide-react";
+import { Github, LogOut, Moon, Plus, Shield, Sun, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,13 +14,16 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useTheme } from "next-themes";
 
 export default function Header() {
   const user = useQuery(api.functions.user.get);
   const isAdmin = useQuery(api.functions.admin.isAdmin);
   const { signOut } = useAuthActions();
+  const { setTheme } = useTheme();
+
   return (
-    <div className="flex flex-row justify-between p-4 bg-primary items-center">
+    <div className="flex flex-row justify-between p-4 bg-primary items-center dark:bg-secondary">
       <Link href="/">
         <Image
           src="/logo-w.png"
@@ -35,7 +38,10 @@ export default function Header() {
         <div className="flex flex-row gap-4 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button aria-label="Account menu">
+              <button
+                aria-label="Account menu"
+                className="dark:border rounded-full"
+              >
                 <Avatar className="size-12">
                   <AvatarImage
                     src={user.image || undefined}
@@ -93,6 +99,26 @@ export default function Header() {
               >
                 <LogOut className="size-4" />
                 Uitloggen
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+                <span className="sr-only">Thema switchen</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Licht
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Donker
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                Systeem
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -7,7 +7,15 @@ import Header from "@/components/Header";
 import { ConvexReactClient } from "convex/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ThemeProvider } from "@/components/SiteThemeProvider";
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -33,41 +41,50 @@ export default function RootLayout({
   }, [preview]);
 
   return (
-    <html lang="en">
+    <html lang="nl" suppressHydrationWarning>
       <body className={`${roboto.className} antialiased min-h-screen`}>
         <ConvexAuthProvider client={convex}>
-          {!preview && <Header />}
-
-          <Dialog
-            open={open}
-            onOpenChange={(nextOpen) => {
-              setOpen(nextOpen);
-              if (!nextOpen) {
-                localStorage.setItem("stm_seenDisclaimer", "1");
-              }
-            }}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Let op</DialogTitle>
-                <DialogDescription>
-                  De StudyTools Marketplace is een onofficieel community-project en is dus niet gelinked aan Quinten of StudyTools in het algemeen.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  onClick={() => {
-                    setOpen(false);
-                    localStorage.setItem("stm_seenDisclaimer", "1");
-                  }}
-                >
-                  Ik begrijp het
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            {!preview && <Header />}
 
-          {children}
+            <Dialog
+              open={open}
+              onOpenChange={(nextOpen) => {
+                setOpen(nextOpen);
+                if (!nextOpen) {
+                  localStorage.setItem("stm_seenDisclaimer", "1");
+                }
+              }}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Let op</DialogTitle>
+                  <DialogDescription>
+                    De StudyTools Marketplace is een onofficieel
+                    community-project en is dus niet gelinked aan Quinten of
+                    StudyTools in het algemeen.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    onClick={() => {
+                      setOpen(false);
+                      localStorage.setItem("stm_seenDisclaimer", "1");
+                    }}
+                  >
+                    Ik begrijp het
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {children}
+          </ThemeProvider>
         </ConvexAuthProvider>
       </body>
     </html>
